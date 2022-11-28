@@ -209,6 +209,7 @@ class CoreDataRelationshipViewModel: ObservableObject {
         newTaskObject.addToSubTasks(subTasks[0])
         save()
     }
+
     // 7,4
     
     

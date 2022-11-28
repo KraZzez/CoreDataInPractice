@@ -22,9 +22,64 @@ struct CoreDataRelationships: View {
                         Text("Add new task")
                     }
                     
+               /*     VStack{
+                        Text("Today's tasks!")
+                        ForEach(vm.taskObjects) { object in
+                            TaskObjectViews(entity: object)
+                        }
+                    }
+                    .onAppear(){
+                        vm.getTaskObjects()
+                    }
+                */
+                    
+                    VStack{
+                        Text("Today's tasks!")
+                        ForEach(vm.taskObjects) { object in
+                            if object.frequency?.name == "Daily" {
+                                TaskObjectViews(entity: object)
+                            }
+                        }
+                        Text("Weekly tasks!")
+                        ForEach(vm.taskObjects) { object in
+                            if object.frequency?.name == "Weekly" {
+                                TaskObjectViews(entity: object)
+                            }
+                        }
+                        Text("Monthly tasks!")
+                        ForEach(vm.taskObjects) { object in
+                            if object.frequency?.name == "Monthly" {
+                                TaskObjectViews(entity: object)
+                            }
+                        }
+                    }
+                    .onAppear(){
+                        vm.getTaskObjects()
+                    }
                     
                     
-
+                    /*
+                     if let daily = vm.getTaskObjects(forFrequency: vm.frequencies[0]) {
+                     Text("Today's tasks!")
+                     ForEach(daily) { taskObject in
+                     TaskObjectViews(entity: taskObject)
+                     }
+                     }
+                     if let weekly = vm.getTaskObjects(forFrequency: vm.frequencies[1]) {
+                     Text("Weekly tasks!")
+                     ForEach(weekly) { taskObject in
+                     TaskObjectViews(entity: taskObject)
+                     }
+                     }
+                     if let monthly = vm.getTaskObjects(forFrequency: vm.frequencies[2]) {
+                     Text("Monthly tasks!")
+                     ForEach(monthly) { taskObject in
+                     TaskObjectViews(entity: taskObject)
+                     }
+                     } */
+                    
+                    
+                    
                     
                     ScrollView(.horizontal, showsIndicators: true, content: {
                         HStack(alignment: .top) {
@@ -171,3 +226,52 @@ struct SubTaskView: View {
         .shadow(radius: 10)
     }
 }
+
+struct TaskObjectViews: View {
+    
+    let entity: TaskObject
+    @StateObject var vm = CoreDataRelationshipViewModel()
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            HStack {
+                Button {
+                    entity.isComplete.toggle()
+                    vm.save()
+                } label: {
+                    if entity.isComplete {
+                        Image(systemName: "checkmark.circle")
+                    } else {
+                        Image(systemName: "circle")
+                    }
+                }
+                Text("\(entity.mainTask ?? "")")
+                    .bold()
+            }
+            if let subTasks = entity.subTasks?.allObjects as? [SubTask] {
+                ForEach(subTasks) { subTask in
+                    HStack {
+                        Button {
+                            subTask.isComplete.toggle()
+                            vm.save()
+                        } label: {
+                            if subTask.isComplete {
+                                Image(systemName: "checkmark.circle")
+                            } else {
+                                Image(systemName: "circle")
+                            }
+                        }
+                        Text(subTask.name ?? "")
+                    }
+                    .padding(.leading)
+                }
+            }
+        }
+        .padding()
+        .frame(maxWidth: 300, alignment: .leading)
+        .background(Color.green.opacity(0.5))
+        .cornerRadius(10)
+        .shadow(radius: 10)
+    }
+}
+
